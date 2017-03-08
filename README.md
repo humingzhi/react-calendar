@@ -17,3 +17,6 @@
 | closeOnClickOutside | bool | close when use click outside the component | true | true/false |
 | disablePanelAnimation | bool | disable animation inside the component | false | true/false |
 | panelAnimation | string | animation for the component show up | fade | fade/zoom |
+
+### get start
+> clone this repo and run `npm install & npm start`, then open browser at localhost:3003
