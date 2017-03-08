@@ -4,7 +4,7 @@
 ### available options:
 
 | prop | type | meaning | defaults | options |
-|---|
+| ---- | ---- | ------- | -------- | ------- |
 | language | string  | * | chinese | chinese/english |
 | value | Date | default value of component | null | * |
 | daysFormat | string | * | YYYY年MM月DD日 | YYYY/MM/DD |
