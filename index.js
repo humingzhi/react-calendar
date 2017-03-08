@@ -84,7 +84,7 @@ Calendar.PropTypes = {
     open: PropTypes.bool,
     onChange: PropTypes.func,
     clearWhenCancel: PropTypes.bool,
-    viewMode: PropTypes.oneOf(['days', 'time', 'months', 'years']),
+    viewMode: PropTypes.oneOf(['days', 'time']),
     inputProps: PropTypes.object,
     closeOnSelect: PropTypes.bool,
     closeOnClickOutside: PropTypes.bool,

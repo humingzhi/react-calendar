@@ -19,4 +19,4 @@
 | panelAnimation | string | animation for the component show up | fade | fade/zoom |
 
 ### get start
-> clone this repo and run `npm install & npm start`, then open browser at localhost:3003
+> clone this repo and run `npm install && npm start`, then open browser at localhost:3003
