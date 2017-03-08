@@ -1,0 +1,33 @@
+/**
+ * Author: humingzhi
+ * Date: 20/02/2017
+ * Email: 1330745625@qq.com
+ * Simply react component for datetime picker
+ */
+import React, {Component, PropTypes} from 'react'
+
+export default class DateTime extends Component {
+    constructor(props) {
+        super(props)
+    }
+
+    render() {
+        return (
+            <div className="rdt-picker">
+                <input />
+            </div>
+        )
+    }
+}
+
+DateTime.PropTypes = {
+    defaultValue: PropTypes.string,
+    dateFormat: PropTypes.string,
+    timeFormat: PropTypes.string,
+    open: PropTypes.bool,
+    onChange: PropTypes.func,
+    onOpen: PropTypes.func,
+    onClose: PropTypes.func,
+    viewMode: PropTypes.oneOf(['years', 'months', 'days', 'time']),
+    className: PropTypes.string
+}
