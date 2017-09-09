@@ -39,24 +39,16 @@ export function isToday(date) {
     return sameDay(date, today)
 }
 
-export function formatDate(viewMode, date, format) {
+export function formatDate(viewMode='date', date, format="YYYY-MM-DD", time) {
     if(!date) return ''
     switch (viewMode) {
-        case 'years':
-            return format.replace(/YYYY/g, date.getFullYear())
-        case 'months':
-            return format
-                .replace(/YYYY/g, date.getFullYear())
-                .replace(/MM/g, date.getMonth()+1)
         case 'time':
             return format
                 .replace(/YYYY/g, date.getFullYear())
                 .replace(/MM/g, date.getMonth()+1)
                 .replace(/DD/g, date.getDate())
-                .replace(/hh/g, date.getHours())
-                .replace(/mm/g, date.getMinutes())
-                .replace(/ss/g, date.getSeconds())
-        case 'days':
+                .replace(/hh/g, time)
+        case 'date':
         default:
             return format
                 .replace(/YYYY/g, date.getFullYear())

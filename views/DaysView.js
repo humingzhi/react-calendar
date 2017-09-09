@@ -6,7 +6,7 @@
 import React, {Component, PropTypes} from 'react'
 import ReactCssTransitionGroup from 'react-addons-css-transition-group'
 import {getYMDays, getWeekOfDate, isToday, sameDay, formatDate, compareDates} from '../utils/helper'
-import {months, week, buttons, weekends} from '../utils/locale'
+import {months, week, buttons, weekends, hour} from '../utils/locale'
 
 export default class DaysView extends Component {
     constructor(props) {
@@ -15,6 +15,7 @@ export default class DaysView extends Component {
         const year = date.getFullYear()
         const month = date.getMonth()
         const _date = date.getDate()
+        const hour = date.getHours()
         this.getDates = this.getDates.bind(this)
         this.renderDates = this.renderDates.bind(this)
         this.clickLeft = this.clickLeft.bind(this)
@@ -23,7 +24,8 @@ export default class DaysView extends Component {
         this.cancel = this.cancel.bind(this)
         this._getChoseDate = this._getChoseDate.bind(this)
         this._notifyView = this._notifyView.bind(this)
-        this.state = {year,month,date:_date,direction:'Right',choseDate: props.defaultValue,before: false}
+        this.renderHours = this.renderHours.bind(this)
+        this.state = {year,month,date:_date,hour,direction:'Right',choseDate: props.defaultValue,before: false,hasChoseDate:false}
         this.key = 0
     }
 
@@ -34,11 +36,11 @@ export default class DaysView extends Component {
     _getChoseDate() {
         const date = this.state.choseDate
         if(!date) return ''
-        return formatDate('days', date, this.props.format)
+        return formatDate('date', date, this.props.dateFormat)
     }
 
-    _notifyView(date) {
-        this.props.onChoose(date)
+    _notifyView(date, time, cancel) {
+        this.props.onChoose(date,time,cancel)
     }
 
     choseDate(date) {
@@ -46,9 +48,13 @@ export default class DaysView extends Component {
         let before = this.state.before
         date = date.date
         if(lastChoseValue) before = compareDates(date, lastChoseValue) < 0
-        this.setState({choseDate: date, before})
-        if(this.props.closeOnSelect) {
-            this._notifyView(date)
+        if(this.props.viewMode==='time') {
+            this.setState({choseDate: date, before, hasChoseDate: true})
+        }else {
+            this.setState({choseDate: date, before})
+            if(this.props.closeOnSelect) {
+                this._notifyView(date)
+            }
         }
     }
     
@@ -127,12 +133,21 @@ export default class DaysView extends Component {
         return childs
     }
 
+    renderHours() {
+        return [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23].map(v => <span onClick={this.chooseHour.bind(this, v)} className={this.state.hour==v?'cal-hour active':'cal-hour'} key={v}>{v}</span>)
+    }
+
+    chooseHour(v) {
+        this.setState({hour: v})
+    }
+
     confirm() {
-        this._notifyView(this.state.choseDate)
+        const time = this.props.viewMode === 'time' && this.state.hasChoseDate ? this.state.hour : ''
+        this._notifyView(this.state.choseDate, time, false)
     }
 
     cancel() {
-        this._notifyView(this.props.defaultValue, !this.props.clearWhenCancel)
+        this._notifyView('', '', true)
     }
 
     render() {
@@ -144,8 +159,10 @@ export default class DaysView extends Component {
         const dateFormat = this._getChoseDate()
         const _month = months[language][state.month]
         const _week = choseDate ? weekends[language][choseDate.getDay()] : ''
+        const viewMode = props.viewMode
+        const _hour = viewMode === 'time' && state.hasChoseDate ? state.hour+hour[language] : ''
         return (
-            <div className="cal-day">
+            <div className="cal-day" style={props.panelStyle}>
                 <div className="cal-title">
                     <div className="cal-title-cover">
                         <ReactCssTransitionGroup
@@ -156,41 +173,48 @@ export default class DaysView extends Component {
                             <div key={_week+dateFormat+'-fill'} className="chose-date">
                                 <span className="weekend" key={_week}>{_week}</span>
                                 <span className="date" key={dateFormat+'date'}>{dateFormat}</span>
+                                <span className="hour" key={_hour}>{_hour}</span>
                             </div>
                         </ReactCssTransitionGroup>
                     </div>
                 </div>
                 <div className="cal-date-panel">
-                    <div className="cal-current-month">
-                        <button className="left" onClick={this.clickLeft}>&#60;</button>
-                        <span className="y-m-cover">
-                            <ReactCssTransitionGroup
-                                transitionName={state.direction === "Right" ? "slideDown" : "slideUp"}
-                                transitionEnterTimeout={500}
-                                transitionLeave={false}
-                            >
-                                <span key={_month+state.year} className="current-month">
-                                    <span className="y-m-title" key={_month}>{_month+' '}</span>
-                                    <span className="y-m-title" key={state.year}>{state.year}</span>
+                    {
+                        props.viewMode==='time'&&state.hasChoseDate
+                        ? this.renderHours() :
+                        <div>
+                            <div className="cal-current-month">
+                                <button className="left" onClick={this.clickLeft}>&#60;</button>
+                                <span className="y-m-cover">
+                                    <ReactCssTransitionGroup
+                                        transitionName={state.direction === "Right" ? "slideDown" : "slideUp"}
+                                        transitionEnterTimeout={500}
+                                        transitionLeave={false}
+                                    >
+                                        <span key={_month+state.year} className="current-month">
+                                            <span className="y-m-title" key={_month}>{_month+' '}</span>
+                                            <span className="y-m-title" key={state.year}>{state.year}</span>
+                                        </span>
+                                    </ReactCssTransitionGroup>
                                 </span>
-                            </ReactCssTransitionGroup>
-                        </span>
-                        <button className="right" onClick={this.clickRight}>&#62;</button>
-                    </div>
-                    <div className="cal-week" key="cal-week">
-                        {
-                            week[props.language].map(w => <span key={w} className="cal-week-item">{w}</span>)
-                        }
-                    </div>
-                    <div className="cal-day-body">
-                        <ReactCssTransitionGroup
-                            transitionName={"slide"+state.direction}
-                            transitionEnterTimeout={500}
-                            transitionLeaveTimeout={500}
-                        >
-                            <div className="cal-day-body-entity" key={_month+state.year}>{dates}</div>
-                        </ReactCssTransitionGroup>
-                    </div>
+                                <button className="right" onClick={this.clickRight}>&#62;</button>
+                            </div>
+                            <div className="cal-week" key="cal-week">
+                                {
+                                    week[props.language].map(w => <span key={w} className="cal-week-item">{w}</span>)
+                                }
+                            </div>
+                            <div className="cal-day-body">
+                                <ReactCssTransitionGroup
+                                    transitionName={"slide"+state.direction}
+                                    transitionEnterTimeout={500}
+                                    transitionLeaveTimeout={500}
+                                >
+                                    <div className="cal-day-body-entity" key={_month+state.year}>{dates}</div>
+                                </ReactCssTransitionGroup>
+                            </div>
+                        </div>
+                    }
                     <div className="cal-day-buttons">
                         <button onClick={this.cancel}>{buttons[language].days.cancel}</button>
                         <button onClick={this.confirm}>{buttons[language].days.confirm}</button>

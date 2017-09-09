@@ -12,6 +12,9 @@ render(
     <div>
         <Calendar
             panelAnimation="fade"
+            viewMode='time'
+            timeFormat="YYYY年MM月DD日 hh时"
+            dateFormat="YYYY年MM月DD日"
             inputProps = {{
            'id': "a-react-calendar",
            'className': 'general-input',

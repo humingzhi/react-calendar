@@ -12,7 +12,7 @@ import {formatDate} from './utils/helper'
 export default class Calendar extends Component {
     constructor(props) {
         super(props)
-        this.state = {focus: false, inputValue: props.value||void(0)}
+        this.state = {focus: false, inputValue: props.value||0, inputTime: props.time||0}
         this._handleDayChoose = this._handleDayChoose.bind(this)
         this.clickOutsideHandler = this.clickOutsideHandler.bind(this)
     }
@@ -31,10 +31,13 @@ export default class Calendar extends Component {
         this.setState({inputValue: nextProps.value})
     }
     
-    _handleDayChoose(date, cancel) {
-        if(cancel) return
-        this.props.onChange && this.props.onChange(date)
-        this.setState({inputValue: date, focus: false})
+    _handleDayChoose(date, time, cancel) {
+        if(cancel) {
+            this.setState({focus: false})            
+        }else {
+            this.props.onChange && this.props.onChange(date, time)
+            this.setState({inputValue: date, inputTime: time, focus: false})
+        }
     }
 
     inputFocus() {
@@ -53,7 +56,7 @@ export default class Calendar extends Component {
       	const props = this.props
         const open = props.open || this.state.focus
         const viewMode = props.viewMode
-        const value = formatDate(props.viewMode, this.state.inputValue, props[viewMode+'Format'])
+        const value = formatDate(props.viewMode, this.state.inputValue, viewMode==='date'?props.dateFormat:props.timeFormat, this.state.inputTime)
         return (
             <div className="cal-picker" ref="picker">
                 <input type="text" {...props.inputProps} value={value} onFocus={this.inputFocus.bind(this)} />
@@ -63,13 +66,16 @@ export default class Calendar extends Component {
                     transitionLeaveTimeout={500}
                 >
                     {open && <Days 
+                        panelStyle={props.panelStyle}
                         key="days-panel" 
                         onChoose={this._handleDayChoose} 
                         defaultValue={this.state.inputValue} 
                         language={props.language}
-                        format={props[viewMode+'Format']}
+                        dateFormat={props.dateFormat}
+                        timeFormat={props.timeFormat}
                         clearWhenCancel={props.clearWhenCancel}
                         closeOnSelect={props.closeOnSelect}
+                        viewMode={viewMode}
                     />}
                 </ReactCssTransitionGroup>
             </div>
@@ -84,7 +90,7 @@ Calendar.PropTypes = {
     open: PropTypes.bool,
     onChange: PropTypes.func,
     clearWhenCancel: PropTypes.bool,
-    viewMode: PropTypes.oneOf(['days', 'time']),
+    viewMode: PropTypes.oneOf(['date', 'time']),
     inputProps: PropTypes.object,
     closeOnSelect: PropTypes.bool,
     closeOnClickOutside: PropTypes.bool,
@@ -97,7 +103,7 @@ Calendar.defaultProps = {
     language: 'chinese',
     daysFormat: 'YYYY年MM月DD日',
     open: false,
-    viewMode: 'days',
+    viewMode: 'date',
     closeOnSelect: false,
     clearWhenCancel: false,
     closeOnClickOutside: true,

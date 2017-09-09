@@ -18,6 +18,11 @@ export const weekends = {
     chinese: ['星期日','星期一','星期二','星期三','星期四','星期五','星期六']
 }
 
+export const hour = {
+    english: 'h',
+    chinese: '时'
+}
+
 export const buttons = {
     chinese: {
         days: {
